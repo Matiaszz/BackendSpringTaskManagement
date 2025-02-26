@@ -29,7 +29,6 @@ public class TaskList {
 
     @OneToMany(mappedBy = "taskList", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks = new ArrayList<>();
-
     private int percentageProgress = 0;
 
     @CreationTimestamp
@@ -39,4 +38,8 @@ public class TaskList {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    public void addTask(Task task){
+        tasks.add(task);
+        task.setTaskList(this);
+    }
 }
