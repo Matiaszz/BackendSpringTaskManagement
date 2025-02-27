@@ -37,4 +37,11 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "task_list_id", nullable = false)
     private TaskList taskList;
+
+    public Task(String name, String shortDescription, String longDescription, TaskList taskList) {
+        this.name = name;
+        this.shortDescription = shortDescription;
+        this.longDescription = longDescription;
+        this.taskList = taskList;
+    }
 }
