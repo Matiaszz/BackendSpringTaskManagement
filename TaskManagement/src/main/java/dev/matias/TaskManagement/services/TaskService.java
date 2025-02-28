@@ -2,6 +2,7 @@ package dev.matias.TaskManagement.services;
 
 import dev.matias.TaskManagement.domain.Task;
 import dev.matias.TaskManagement.domain.TaskList;
+import dev.matias.TaskManagement.dtos.MaxTaskDTO;
 import dev.matias.TaskManagement.dtos.MinTaskDTO;
 import dev.matias.TaskManagement.requests.TaskRequest;
 import dev.matias.TaskManagement.repositories.TaskListRepository;
@@ -25,9 +26,17 @@ public class TaskService {
 
     private PostTaskValidations postTaskValidations;
 
-    public List<MinTaskDTO> getTasks() {
+    public List<MinTaskDTO> getMinTasks() {
         List<Task> tasks = taskRepository.findAll();
-        return tasks.stream().map(task -> new MinTaskDTO(task.getId(), task.getName(), task.getShortDescription(), task.getIsDone())).toList();
+        return tasks.stream().map(task -> new MinTaskDTO(
+                task.getId(), task.getName(), task.getShortDescription(), task.getIsDone())).toList();
+    }
+
+    public List<MaxTaskDTO> getMaxTasks() {
+        List<Task> tasks = taskRepository.findAll();
+        return tasks.stream().map(task -> new MaxTaskDTO(
+                task.getId(), task.getName(), task.getShortDescription(), task.getLongDescription(), task.getIsDone()))
+                .toList();
     }
 
     public ResponseEntity<Task> postTask(TaskRequest taskRequest) {

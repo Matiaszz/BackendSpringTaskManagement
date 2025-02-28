@@ -1,6 +1,7 @@
 package dev.matias.TaskManagement.controllers;
 
 import dev.matias.TaskManagement.domain.Task;
+import dev.matias.TaskManagement.dtos.MaxTaskDTO;
 import dev.matias.TaskManagement.dtos.MinTaskDTO;
 import dev.matias.TaskManagement.requests.TaskRequest;
 import dev.matias.TaskManagement.repositories.TaskListRepository;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -30,7 +30,11 @@ public class TaskController {
 
     @GetMapping("/short")
     public ResponseEntity<List<MinTaskDTO>> getTasks(){
-        return ResponseEntity.ok(taskService.getTasks());
+        return ResponseEntity.ok(taskService.getMinTasks());
+    }
+    @GetMapping("/long")
+    public ResponseEntity<List<MaxTaskDTO>> getLongTasks(){
+        return ResponseEntity.ok(taskService.getMaxTasks());
     }
     @PostMapping
     public ResponseEntity<MinTaskDTO> postTask(@RequestBody TaskRequest taskRequest){
