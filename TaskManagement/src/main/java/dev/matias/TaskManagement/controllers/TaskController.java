@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/tasks")
@@ -36,13 +37,20 @@ public class TaskController {
     public ResponseEntity<List<MaxTaskDTO>> getLongTasks(){
         return ResponseEntity.ok(taskService.getMaxTasks());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MaxTaskDTO> getTask(@PathVariable UUID id){
+        Task task = taskRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Task not found"));
+        return ResponseEntity.ok(new MaxTaskDTO(task.getId(), task.getName(), task.getShortDescription(), task.getLongDescription(), task.getIsDone()));
+    }
+
     @PostMapping
-    public ResponseEntity<MinTaskDTO> postTask(@RequestBody TaskRequest taskRequest){
+    public ResponseEntity<MaxTaskDTO> postTask(@RequestBody TaskRequest taskRequest){
         Task task = taskService.postTask(taskRequest).getBody();
 
         if (task == null) return ResponseEntity.badRequest().build();
 
         return ResponseEntity.ok(
-                new MinTaskDTO(task.getId(), task.getName(), task.getShortDescription(), task.getIsDone()));
+                new MaxTaskDTO(task.getId(), task.getName(), task.getShortDescription(), task.getLongDescription(), task.getIsDone()));
     }
 }
