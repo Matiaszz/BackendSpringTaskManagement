@@ -38,6 +38,8 @@ public class Task {
     @JoinColumn(name = "task_list_id", nullable = false)
     private TaskList taskList;
 
+    public Task(){}
+
     public Task(String name, String shortDescription, String longDescription, TaskList taskList) {
         this.name = name;
         this.shortDescription = shortDescription;

@@ -1,12 +1,9 @@
 package dev.matias.TaskManagement.services;
 
-import dev.matias.TaskManagement.domain.Task;
 import dev.matias.TaskManagement.domain.TaskList;
 import dev.matias.TaskManagement.dtos.MaxTaskDTO;
-import dev.matias.TaskManagement.dtos.MinTaskDTO;
 import dev.matias.TaskManagement.dtos.TaskListDTO;
 import dev.matias.TaskManagement.repositories.TaskListRepository;
-import dev.matias.TaskManagement.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
