@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +33,7 @@ public class TaskListController {
     @GetMapping("/{id}")
     public ResponseEntity<TaskListDTO> getTaskListById(@PathVariable UUID id){
         TaskList taskList = taskListRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("Task list not found"));
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task list not found"));
 
         return ResponseEntity.ok(taskListService.getTaskList(taskList.getId()));
     }
