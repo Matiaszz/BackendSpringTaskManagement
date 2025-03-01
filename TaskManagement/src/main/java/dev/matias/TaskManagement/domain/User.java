@@ -28,8 +28,9 @@ public class User implements UserDetails {
     private String username;
 
 
-    @Column(nullable = false)
-    private UserRole role;
+    @Column(nullable = false, name = "user_role")
+    @Enumerated(EnumType.STRING)
+    private UserRole role = UserRole.USER;
 
     private String name;
     private String lastName;

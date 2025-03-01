@@ -1,18 +1,16 @@
 package dev.matias.TaskManagement.domain;
 
-public enum UserRole {
-    ADMIN("admin"),
-    USER("user");
+import lombok.Getter;
 
-    private String role;
+@Getter
+public enum UserRole {
+    ADMIN("ROLE_ADMIN"),
+    USER("ROLE_USER");
+
+    private final String role;
 
     UserRole(String role){
         this.role = role;
-
-    }
-
-    public String getRole(){
-        return this.role;
     }
 
 }

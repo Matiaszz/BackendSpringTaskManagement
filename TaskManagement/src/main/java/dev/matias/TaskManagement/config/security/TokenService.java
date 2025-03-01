@@ -2,14 +2,11 @@ package dev.matias.TaskManagement.config.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTCreationException;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import dev.matias.TaskManagement.domain.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Service
 public class TokenService {
@@ -17,33 +14,29 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
-
     public String generateToken(User user) {
-        try{
+        try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            String token = JWT.create().withIssuer("TaskManagement")
-                    .withSubject(user.getUsername())
-                    .withExpiresAt(generateExpirationDate())
+            return JWT.create()
+                    .withSubject(user.getUsername()) // O token deve conter o nome do usuário
+                    .withExpiresAt(new Date(System.currentTimeMillis() + 86400000)) // Expira em 24h
                     .sign(algorithm);
-
-            return token;
-
-        }catch (JWTCreationException exception){
-            throw new RuntimeException("Error generating token", exception);
+        } catch (Exception e) {
+            System.out.println("Erro ao gerar token: " + e.getMessage());
+            return null;
         }
     }
 
     public String validateToken(String token) {
-        try{
+        try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            return JWT.require(algorithm).withIssuer("auth-api").build().verify(token).getSubject();
-
-        }catch (JWTVerificationException exception){
-           return "";
+            return JWT.require(algorithm)
+                    .build()
+                    .verify(token)
+                    .getSubject();
+        } catch (Exception e) {
+            System.out.println("Erro ao validar token: " + e.getMessage());
+            return null;
         }
-    }
-
-    public Instant generateExpirationDate() {
-        return LocalDateTime.now().plusHours(2).toInstant(java.time.ZoneOffset.of("-03:00"));
     }
 }

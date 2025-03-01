@@ -1,7 +1,9 @@
 package dev.matias.TaskManagement.controllers;
 
+import dev.matias.TaskManagement.config.security.TokenService;
 import dev.matias.TaskManagement.domain.User;
 import dev.matias.TaskManagement.dtos.AuthenticationDTO;
+import dev.matias.TaskManagement.dtos.LoginResponseDTO;
 import dev.matias.TaskManagement.dtos.RegisterDTO;
 import dev.matias.TaskManagement.repositories.UserRepository;
 import jakarta.validation.Valid;
@@ -20,15 +22,22 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private TokenService tokenService;
 
     @Autowired
     private UserRepository userRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationDTO> login(@RequestBody @Valid AuthenticationDTO data){
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data){
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
         var auth = authenticationManager.authenticate(usernamePassword);
-        return ResponseEntity.ok().build();
+
+        // getPrincipal = User object
+        String token = tokenService.generateToken((User) auth.getPrincipal());
+
+
+        return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
     @PostMapping("/register")
