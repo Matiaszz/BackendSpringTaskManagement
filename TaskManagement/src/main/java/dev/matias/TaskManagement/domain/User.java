@@ -39,13 +39,22 @@ public class User implements UserDetails {
     private String password;
 
     @Lob
-    private String description;
+    private String description = null;
 
     private String profileImageURL = "https://imgs.search.brave.com/1WFIpUNAOtVXo51SuasJnMAgOsPwQQXErqrO6H1Ps1M/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzk4LzFk/LzZiLzk4MWQ2YjJl/MGNjYjVlOTY4YTA2/MThjOGQ0NzY3MWRh/LmpwZw";
 
     @Override
     public String getUsername() {
         return username;
+    }
+
+    public User(String username, UserRole role, String name, String lastName, String email, String password) {
+        this.username = username;
+        this.role = role;
+        this.name = name;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
     }
 
     @Override
