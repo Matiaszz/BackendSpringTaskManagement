@@ -1,7 +1,10 @@
 package dev.matias.TaskManagement.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -11,6 +14,9 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name = "tb_tasks")
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Task {
 
     @Id
@@ -37,8 +43,6 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "task_list_id", nullable = false)
     private TaskList taskList;
-
-    public Task(){}
 
     public Task(String name, String shortDescription, String longDescription, TaskList taskList) {
         this.name = name;

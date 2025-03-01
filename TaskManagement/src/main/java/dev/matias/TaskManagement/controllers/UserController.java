@@ -10,13 +10,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping
+@RequestMapping("user")
 public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user){
+    @PostMapping
+    public ResponseEntity<User> createUser(@RequestBody User user){
+        String password = user.getPassword();
+        if (password == null || password.isEmpty()) return ResponseEntity.badRequest().build();
+
+
         return ResponseEntity.ok(userRepository.save(user));
     }
 }

@@ -1,7 +1,10 @@
 package dev.matias.TaskManagement.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -13,10 +16,17 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name = "tb_task_list")
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class TaskList {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User owner;
 
     @Column(length = 40)
     private String title;
@@ -30,6 +40,8 @@ public class TaskList {
     @OneToMany(mappedBy = "taskList", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks = new ArrayList<>();
     private int percentageProgress = 0;
+
+    private String color = "#ffffff";
 
     @CreationTimestamp
     @Column(updatable = false)
