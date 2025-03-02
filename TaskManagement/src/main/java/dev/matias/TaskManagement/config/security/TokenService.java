@@ -16,13 +16,12 @@ public class TokenService {
 
     public String generateToken(User user) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+            Algorithm algorithm = Algorithm.HMAC256(this.secret);
             return JWT.create()
-                    .withSubject(user.getUsername()) // O token deve conter o nome do usuário
-                    .withExpiresAt(new Date(System.currentTimeMillis() + 86400000)) // Expira em 24h
+                    .withSubject(user.getUsername())
+                    .withExpiresAt(new Date(System.currentTimeMillis() + 86400000))
                     .sign(algorithm);
         } catch (Exception e) {
-            System.out.println("Erro ao gerar token: " + e.getMessage());
             return null;
         }
     }
@@ -35,7 +34,6 @@ public class TokenService {
                     .verify(token)
                     .getSubject();
         } catch (Exception e) {
-            System.out.println("Erro ao validar token: " + e.getMessage());
             return null;
         }
     }
