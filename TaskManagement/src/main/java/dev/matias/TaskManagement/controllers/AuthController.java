@@ -7,6 +7,7 @@ import dev.matias.TaskManagement.dtos.LoginResponseDTO;
 import dev.matias.TaskManagement.dtos.RegisterDTO;
 import dev.matias.TaskManagement.repositories.UserRepository;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -30,18 +32,19 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data){
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
+        log.info("Authenticating user {}", data.username());
         var auth = authenticationManager.authenticate(usernamePassword);
+        log.info("User {} authenticated", data.username());
 
         // getPrincipal = User object
         String token = tokenService.generateToken((User) auth.getPrincipal());
-
-
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
     @PostMapping("/register")
     public ResponseEntity<LoginResponseDTO> register(@RequestBody @Valid RegisterDTO data){
         if (this.userRepository.findByUsername(data.username()) != null) {
+            log.warn("User {} already exists", data.username());
             return ResponseEntity.badRequest().build();
         }
 
@@ -51,7 +54,8 @@ public class AuthController {
                 data.username(), data.role(), data.name(), data.lastName(), data.email(), encryptedPassword
         );
 
-        userRepository.save(user); // Save before generating token
+        userRepository.save(user);
+        log.info("User {} registered", data.username());
 
         String token = tokenService.generateToken(user);
 

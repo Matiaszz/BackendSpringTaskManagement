@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
+@Slf4j
 public class SecurityFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -26,15 +28,14 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = this.recoverToken(request);
+        log.info("Token: {}", token);
 
         if (token != null){
             String login = tokenService.validateToken(token);
             UserDetails user = userRepository.findByUsername(login);
             var authentication = new UsernamePasswordAuthenticationToken(
                     user, null, user.getAuthorities());
-
-
-
+            log.info("Successful authentication for user: {}", user.getUsername());
             // Save user in context
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
@@ -46,8 +47,10 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (authHeader == null) return null;
 
         if (!authHeader.startsWith("Bearer ")){
+            log.warn("Invalid authorization header");
             return null;
         }
+        log.info("Valid authorization header");
         return authHeader.replace("Bearer ", "").trim();
     }
 }
