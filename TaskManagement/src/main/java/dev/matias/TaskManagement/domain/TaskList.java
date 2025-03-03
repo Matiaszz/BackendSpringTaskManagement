@@ -1,5 +1,6 @@
 package dev.matias.TaskManagement.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,8 +25,9 @@ public class TaskList {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private User owner;
 
     @Column(length = 40)
@@ -49,6 +51,13 @@ public class TaskList {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    public TaskList(User owner, String title, String shortDescription, String longDescription){
+        this.owner = owner;
+        this.title = title;
+        this.shortDescription = shortDescription;
+        this.longDescription = longDescription;
+    }
 
     public void addTask(Task task){
         tasks.add(task);

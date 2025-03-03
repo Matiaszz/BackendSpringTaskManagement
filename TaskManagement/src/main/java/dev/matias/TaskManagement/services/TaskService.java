@@ -24,6 +24,7 @@ public class TaskService {
     @Autowired
     private TaskListRepository taskListRepository;
 
+    @Autowired
     private PostTaskValidations postTaskValidations;
 
     public List<MinTaskDTO> getMinTasks() {
@@ -49,7 +50,6 @@ public class TaskService {
 
         taskRepository.save(task);
         taskList.addTask(task);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
 }

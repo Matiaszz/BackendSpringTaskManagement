@@ -2,8 +2,10 @@ package dev.matias.TaskManagement.validations;
 
 import dev.matias.TaskManagement.requests.TaskRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+@Component
 public class PostTaskValidations {
     public void validatePostTask(TaskRequest taskRequest) {
         if (taskRequest == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Body can't be null");
