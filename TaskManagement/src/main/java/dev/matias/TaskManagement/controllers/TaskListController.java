@@ -48,8 +48,10 @@ public class TaskListController {
     public ResponseEntity<TaskList> createTaskList(@RequestBody TaskListRequest request){
         User user = userRepository.findById(request.ownerId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+
         TaskList taskList = new TaskList(user, request.title(), request.shortDescription(), request.longDescription());
         taskListRepository.save(taskList);
+
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

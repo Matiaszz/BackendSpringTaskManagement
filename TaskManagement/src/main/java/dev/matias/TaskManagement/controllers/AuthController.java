@@ -43,7 +43,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<LoginResponseDTO> register(@RequestBody @Valid RegisterDTO data){
-        if (this.userRepository.findByUsername(data.username()) != null) {
+        if (this.userRepository.findByUsername(data.username()).isPresent()) {
             log.warn("User {} already exists", data.username());
             return ResponseEntity.badRequest().build();
         }
