@@ -54,13 +54,23 @@ public class TaskList {
 
     public TaskList(User owner, String title, String shortDescription, String longDescription){
         this.owner = owner;
-        this.title = title;
-        this.shortDescription = shortDescription;
-        this.longDescription = longDescription;
+        this.title = (title != null) ? title : "Untitled";
+        this.shortDescription = (shortDescription != null) ? shortDescription : "";
+        this.longDescription = (longDescription != null) ? longDescription : "";
     }
 
     public void addTask(Task task){
         tasks.add(task);
         task.setTaskList(this);
+    }
+
+    public void updateProgress(){
+        if (tasks.isEmpty()){
+            percentageProgress = 0;
+            return;
+        }
+
+        long completed = tasks.stream().filter(Task::getIsDone).count();
+        this.percentageProgress = (int) ((completed * 100) / tasks.size());
     }
 }

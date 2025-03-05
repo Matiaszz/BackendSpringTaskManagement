@@ -25,7 +25,7 @@ public class TokenService {
             Algorithm algorithm = Algorithm.HMAC256(this.secret);
             return JWT.create()
                     .withSubject(user.getUsername())
-                    .withExpiresAt(new Date(System.currentTimeMillis() + 86400000))
+                    .withExpiresAt(new Date(System.currentTimeMillis() + 86400000 * 2))
                     .sign(algorithm);
         } catch (Exception e) {
             log.error("Error generating token: {}", e.getMessage());
