@@ -1,8 +1,10 @@
 package dev.matias.TaskManagement.controllers;
 
+import dev.matias.TaskManagement.domain.Task;
 import dev.matias.TaskManagement.domain.TaskList;
 import dev.matias.TaskManagement.domain.User;
 import dev.matias.TaskManagement.dtos.TaskListDTO;
+import dev.matias.TaskManagement.dtos.TaskListUpdateDTO;
 import dev.matias.TaskManagement.repositories.TaskListRepository;
 import dev.matias.TaskManagement.repositories.UserRepository;
 import dev.matias.TaskManagement.requests.TaskListRequest;
@@ -52,5 +54,14 @@ public class TaskListController {
         taskListRepository.save(taskList);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TaskListDTO> updateTaskList(@PathVariable UUID id, @RequestBody TaskListUpdateDTO taskListUpdateDTO){
+        TaskList taskList = taskListRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TaskList not found for update."));
+
+        TaskListDTO dto = taskListService.updateTaskList(taskList, taskListUpdateDTO);
+        return ResponseEntity.ok(dto);
     }
 }

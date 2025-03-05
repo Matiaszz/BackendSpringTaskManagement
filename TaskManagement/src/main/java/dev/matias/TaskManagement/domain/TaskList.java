@@ -1,6 +1,8 @@
 package dev.matias.TaskManagement.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import dev.matias.TaskManagement.repositories.TaskListRepository;
+import dev.matias.TaskManagement.repositories.TaskRepository;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -62,6 +64,11 @@ public class TaskList {
     public void addTask(Task task){
         tasks.add(task);
         task.setTaskList(this);
+    }
+
+    public void removeTask(Task task){
+        tasks.remove(task);
+        task.setTaskList(null);
     }
 
     public void updateProgress(){
