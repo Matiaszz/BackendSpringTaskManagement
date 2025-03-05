@@ -34,12 +34,13 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         if (token != null){
             String login = tokenService.validateToken(token);
-            UserDetails user = userRepository.findByUsername(login)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found (Security Filter)"));
+
+            UserDetails user = userRepository.findByUsername(login).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found (Security Filter)"));
 
             var authentication = new UsernamePasswordAuthenticationToken(
                     user, null, user.getAuthorities());
             log.info("Successful authentication for user: {}", user.getUsername());
+
             // Save user in context
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

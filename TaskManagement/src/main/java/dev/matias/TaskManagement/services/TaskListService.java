@@ -41,17 +41,21 @@ public class TaskListService {
         ).toList();
     }
 
-    public TaskListDTO getTaskList(UUID id){
-        TaskList taskList = taskListRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task list not found"));
+    public List<TaskListDTO> getAllTaskLists() {
+        List<TaskList> taskLists = taskListRepository.findAllWithTasks();
 
-        return new TaskListDTO(taskList.getId(), taskList.getTitle(), taskList.getShortDescription(),
-                taskList.getLongDescription(), taskList.getTasks().stream().map(task -> new MaxTaskDTO(
-
-                task.getId(),
-                task.getName(),
-                task.getShortDescription(),
-                task.getLongDescription(),
-                task.getIsDone()
-        )).collect(Collectors.toList()));
+        return taskLists.stream().map(taskList -> new TaskListDTO(
+                taskList.getId(),
+                taskList.getTitle(),
+                taskList.getShortDescription(),
+                taskList.getLongDescription(),
+                taskList.getTasks().stream().map(task -> new MaxTaskDTO(
+                        task.getId(),
+                        task.getName(),
+                        task.getShortDescription(),
+                        task.getLongDescription(),
+                        task.getIsDone()
+                )).collect(Collectors.toList())
+        )).collect(Collectors.toList());
     }
 }
