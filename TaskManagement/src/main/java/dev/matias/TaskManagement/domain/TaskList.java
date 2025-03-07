@@ -3,6 +3,7 @@ package dev.matias.TaskManagement.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import dev.matias.TaskManagement.repositories.TaskListRepository;
 import dev.matias.TaskManagement.repositories.TaskRepository;
+import dev.matias.TaskManagement.services.AuthorizationService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -54,8 +55,8 @@ public class TaskList {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public TaskList(User owner, String title, String shortDescription, String longDescription){
-        this.owner = owner;
+    public TaskList(AuthorizationService authorizationService, String title, String shortDescription, String longDescription){
+        this.owner = (User) authorizationService.getLoggedUser();
         this.title = (title != null) ? title : "Untitled";
         this.shortDescription = (shortDescription != null) ? shortDescription : "";
         this.longDescription = (longDescription != null) ? longDescription : "";

@@ -2,6 +2,7 @@ package dev.matias.TaskManagement.controllers;
 
 import dev.matias.TaskManagement.config.security.TokenService;
 import dev.matias.TaskManagement.domain.User;
+import dev.matias.TaskManagement.domain.UserRole;
 import dev.matias.TaskManagement.dtos.AuthenticationDTO;
 import dev.matias.TaskManagement.dtos.LoginResponseDTO;
 import dev.matias.TaskManagement.dtos.RegisterDTO;
@@ -51,7 +52,7 @@ public class AuthController {
         var encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
 
         User user = new User(
-                data.username(), data.role(), data.name(), data.lastName(), data.email(), encryptedPassword
+                data.username(), data.role().orElse(UserRole.USER), data.name(), data.lastName(), data.email(), encryptedPassword
         );
 
         userRepository.save(user);
