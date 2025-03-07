@@ -48,7 +48,7 @@ public class TaskListController {
 
         UserDetails loggedUser = authorizationService.getLoggedUser();
         if (!loggedUser.getUsername().equalsIgnoreCase(taskList.getOwner().getUsername())){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task List not found (wrong user)");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task List not found");
         }
         return ResponseEntity.ok(new TaskListDTO(taskList));
     }
@@ -68,5 +68,15 @@ public class TaskListController {
 
         TaskListDTO dto = taskListService.updateTaskList(taskList, taskListUpdateDTO);
         return ResponseEntity.ok(dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTaskList(@PathVariable UUID id){
+        TaskList taskList = taskListRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task list not found"));
+
+        taskListService.deleteTaskList(taskList);
+
+        return ResponseEntity.ok().build();
     }
 }

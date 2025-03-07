@@ -86,4 +86,13 @@ public class TaskListService {
         return new TaskListDTO(taskList);
     }
 
+    public void deleteTaskList(TaskList taskList){
+        UserDetails loggedUser = authorizationService.getLoggedUser();
+
+        if (!loggedUser.getUsername().equalsIgnoreCase(taskList.getOwner().getUsername())){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task list not found (wrong user)");
+        }
+
+        taskListRepository.deleteById(taskList.getId());
+    }
 }
