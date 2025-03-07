@@ -3,12 +3,10 @@ package dev.matias.TaskManagement.controllers;
 import dev.matias.TaskManagement.domain.Task;
 import dev.matias.TaskManagement.domain.TaskList;
 import dev.matias.TaskManagement.dtos.MaxTaskDTO;
-import dev.matias.TaskManagement.dtos.MinTaskDTO;
 import dev.matias.TaskManagement.requests.TaskRequest;
 import dev.matias.TaskManagement.repositories.TaskListRepository;
 import dev.matias.TaskManagement.repositories.TaskRepository;
 import dev.matias.TaskManagement.services.TaskService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,15 +28,9 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
-    private MinTaskDTO minTaskDTO;
 
-
-    @GetMapping("/short")
-    public ResponseEntity<List<MinTaskDTO>> getTasks(){
-        return ResponseEntity.ok(taskService.getMinTasks());
-    }
-    @GetMapping("/long")
-    public ResponseEntity<List<MaxTaskDTO>> getLongTasks(){
+    @GetMapping
+    public ResponseEntity<List<MaxTaskDTO>> getTasks(){
         return ResponseEntity.ok(taskService.getMaxTasks());
     }
 

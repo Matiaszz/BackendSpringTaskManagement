@@ -13,4 +13,6 @@ public interface TaskListRepository extends JpaRepository<TaskList, UUID> {
 
     @Query("SELECT tl FROM TaskList tl LEFT JOIN FETCH tl.tasks")
     List<TaskList> findAllWithTasks();
+
+    List<TaskList> findByOwnerId(UUID id);
 }

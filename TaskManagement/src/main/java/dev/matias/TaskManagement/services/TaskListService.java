@@ -1,6 +1,7 @@
 package dev.matias.TaskManagement.services;
 
 import dev.matias.TaskManagement.domain.TaskList;
+import dev.matias.TaskManagement.domain.User;
 import dev.matias.TaskManagement.dtos.MaxTaskDTO;
 import dev.matias.TaskManagement.dtos.TaskListDTO;
 import dev.matias.TaskManagement.dtos.TaskListUpdateDTO;
@@ -26,45 +27,19 @@ public class TaskListService {
     @Autowired
     private AuthorizationService authorizationService;
 
-
-    public List<TaskListDTO> getTasks() {
-        List<TaskList> taskLists = taskListRepository.findAll();
-
-        return taskLists.stream().map(taskList -> new TaskListDTO(
-                taskList.getId(),
-                taskList.getTitle(),
-                taskList.getShortDescription(),
-                taskList.getLongDescription(),
-                taskList.getColor(),
-                taskList.getTasks().stream().map(
-                        task -> new MaxTaskDTO(
-                        task.getId(),
-                        task.getName(),
-                        task.getShortDescription(),
-                        task.getLongDescription(),
-                        task.getIsDone()
-                )).collect(Collectors.toList())
-        )
-        ).toList();
-    }
-
     public List<TaskListDTO> getAllTaskLists() {
         List<TaskList> taskLists = taskListRepository.findAllWithTasks();
 
-        return taskLists.stream().map(taskList -> new TaskListDTO(
-                taskList.getId(),
-                taskList.getTitle(),
-                taskList.getShortDescription(),
-                taskList.getLongDescription(),
-                taskList.getColor(),
-                taskList.getTasks().stream().map(task -> new MaxTaskDTO(
-                        task.getId(),
-                        task.getName(),
-                        task.getShortDescription(),
-                        task.getLongDescription(),
-                        task.getIsDone()
-                )).collect(Collectors.toList())
-        )).collect(Collectors.toList());
+        return taskLists.stream().map(TaskListDTO::new).toList();
+    }
+
+    public ResponseEntity<List<TaskListDTO>> getTaskListByUser(User user){
+        List<TaskList> taskLists = taskListRepository.findByOwnerId(user.getId());
+        if (taskLists.isEmpty()){
+            return ResponseEntity.noContent().build();
+        }
+        List<TaskListDTO> dtoList = taskLists.stream().map(TaskListDTO::new).toList();
+        return ResponseEntity.ok(dtoList);
     }
 
     public TaskListDTO updateTaskList(TaskList taskList, TaskListUpdateDTO taskListUpdateDTO){
@@ -90,7 +65,7 @@ public class TaskListService {
         UserDetails loggedUser = authorizationService.getLoggedUser();
 
         if (!loggedUser.getUsername().equalsIgnoreCase(taskList.getOwner().getUsername())){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task list not found (wrong user)");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task list not found.");
         }
 
         taskListRepository.deleteById(taskList.getId());

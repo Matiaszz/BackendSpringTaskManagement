@@ -11,7 +11,7 @@ public record TaskListDTO(
         String shortDescription,
         String longDescription,
         String color,
-        List<MaxTaskDTO> taskList
+        List<MaxTaskDTO> tasks
 ) {
     public TaskListDTO(TaskList taskList) {
         this(

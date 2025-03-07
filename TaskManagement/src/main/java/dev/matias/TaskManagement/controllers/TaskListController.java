@@ -37,8 +37,14 @@ public class TaskListController {
     private AuthorizationService authorizationService;
 
     @GetMapping
+    public ResponseEntity <List<TaskListDTO>> getTaskListByUser(){
+        UserDetails loggedUser = authorizationService.getLoggedUser();
+        return taskListService.getTaskListByUser((User) loggedUser);
+    }
+
+    @GetMapping("/taskLists")
     public ResponseEntity <List<TaskListDTO>> getTaskList(){
-        return ResponseEntity.ok(taskListService.getTasks());
+        return ResponseEntity.ok(taskListService.getAllTaskLists());
     }
 
     @GetMapping("/{id}")
