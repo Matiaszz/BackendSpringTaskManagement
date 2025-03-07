@@ -1,6 +1,7 @@
 package dev.matias.TaskManagement.controllers;
 
 import dev.matias.TaskManagement.domain.Task;
+import dev.matias.TaskManagement.domain.TaskList;
 import dev.matias.TaskManagement.dtos.MaxTaskDTO;
 import dev.matias.TaskManagement.dtos.MinTaskDTO;
 import dev.matias.TaskManagement.requests.TaskRequest;
@@ -9,8 +10,10 @@ import dev.matias.TaskManagement.repositories.TaskRepository;
 import dev.matias.TaskManagement.services.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -47,7 +50,11 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<MaxTaskDTO> postTask(@RequestBody TaskRequest taskRequest){
-        Task task = taskService.postTask(taskRequest).getBody();
+
+        TaskList taskList = taskListRepository.findById(taskRequest.taskListId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task list not found"));
+
+        Task task = taskService.postTask(taskRequest, taskList).getBody();
 
         if (task == null) return ResponseEntity.badRequest().build();
 

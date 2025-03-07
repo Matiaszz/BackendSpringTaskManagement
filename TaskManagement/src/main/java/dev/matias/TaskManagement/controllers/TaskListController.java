@@ -42,11 +42,15 @@ public class TaskListController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<TaskListDTO>> getTaskListById(@PathVariable UUID id){
+    public ResponseEntity<TaskListDTO> getTaskListById(@PathVariable UUID id){
         TaskList taskList = taskListRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task list not found"));
 
-        return ResponseEntity.ok(taskListService.getTasks());
+        UserDetails loggedUser = authorizationService.getLoggedUser();
+        if (!loggedUser.getUsername().equalsIgnoreCase(taskList.getOwner().getUsername())){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task List not found (wrong user)");
+        }
+        return ResponseEntity.ok(new TaskListDTO(taskList));
     }
 
     @PostMapping

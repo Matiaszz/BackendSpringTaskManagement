@@ -40,11 +40,8 @@ public class TaskService {
                 .toList();
     }
 
-    public ResponseEntity<Task> postTask(TaskRequest taskRequest) {
+    public ResponseEntity<Task> postTask(TaskRequest taskRequest, TaskList taskList) {
         postTaskValidations.validatePostTask(taskRequest);
-
-        TaskList taskList = taskListRepository.findById(taskRequest.taskListId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task list not found"));
 
         Task task = new Task(taskRequest.name(), taskRequest.shortDescription(), taskRequest.longDescription(), taskList);
 
