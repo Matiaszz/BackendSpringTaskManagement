@@ -55,6 +55,8 @@ public class TaskListService {
                 : taskList.getLongDescription());
 
         taskList.setColor((taskListUpdateDTO.color() != null) ? taskListUpdateDTO.color() : taskList.getColor());
+        
+        taskListRepository.save(taskList);
         return new TaskListDTO(taskList);
     }
 

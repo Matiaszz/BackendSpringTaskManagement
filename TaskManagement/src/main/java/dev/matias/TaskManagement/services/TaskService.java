@@ -2,14 +2,12 @@ package dev.matias.TaskManagement.services;
 
 import dev.matias.TaskManagement.domain.Task;
 import dev.matias.TaskManagement.domain.TaskList;
-import dev.matias.TaskManagement.domain.User;
 import dev.matias.TaskManagement.dtos.MaxTaskDTO;
 import dev.matias.TaskManagement.dtos.TaskUpdateDTO;
 import dev.matias.TaskManagement.repositories.TaskListRepository;
 import dev.matias.TaskManagement.requests.TaskRequest;
 import dev.matias.TaskManagement.repositories.TaskRepository;
 import dev.matias.TaskManagement.validations.PostTaskValidations;
-import jakarta.validation.constraints.Max;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,22 +33,23 @@ public class TaskService {
     @Autowired
     private TaskListRepository taskListRepository;
 
-    public List<MaxTaskDTO> getListByTaskListId(UUID taskListId){
+    public List<MaxTaskDTO> getListByTaskListId(UUID taskListId) {
         UserDetails loggedUser = authorizationService.getLoggedUser();
         TaskList taskList = taskListRepository.findById(taskListId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task List not found."));
 
-        if (!taskList.getOwner().getUsername().equalsIgnoreCase(loggedUser.getUsername())){
+        if (!taskList.getOwner().getUsername().equalsIgnoreCase(loggedUser.getUsername())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tasks not found.");
         }
         return taskList.getTasks().stream().map(MaxTaskDTO::new).toList();
     }
 
-    public ResponseEntity<MaxTaskDTO>  getTask(UUID id){
-        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
+    public ResponseEntity<MaxTaskDTO> getTask(UUID id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
         UserDetails loggedUser = authorizationService.getLoggedUser();
 
-        if (!task.getTaskList().getOwner().getUsername().equalsIgnoreCase(loggedUser.getUsername())){
+        if (!task.getTaskList().getOwner().getUsername().equalsIgnoreCase(loggedUser.getUsername())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task Not found.");
         }
         return ResponseEntity.ok(new MaxTaskDTO(task));
@@ -72,21 +71,30 @@ public class TaskService {
         return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
 
-    public MaxTaskDTO updateTask(Task taskToUpdate, TaskUpdateDTO body){
+    public MaxTaskDTO updateTask(Task taskToUpdate, TaskUpdateDTO body) {
         UserDetails loggedUser = authorizationService.getLoggedUser();
 
-        if (!taskToUpdate.getTaskList().getOwner().getUsername().equalsIgnoreCase(loggedUser.getUsername())){
+        if (!taskToUpdate.getTaskList().getOwner().getUsername().equalsIgnoreCase(loggedUser.getUsername())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found.");
         }
 
         taskToUpdate.setName((body.name() != null) ? body.name() : taskToUpdate.getName());
-        taskToUpdate.setLongDescription((body.longDescription() != null) ? body.longDescription() : taskToUpdate.getLongDescription());
-        taskToUpdate.setShortDescription((body.shortDescription() != null) ? body.shortDescription() : taskToUpdate.getShortDescription());
+        taskToUpdate.setLongDescription(
+                (body.longDescription() != null) ? body.longDescription() : taskToUpdate.getLongDescription());
+        taskToUpdate.setShortDescription(
+                (body.shortDescription() != null) ? body.shortDescription() : taskToUpdate.getShortDescription());
         taskToUpdate.setIsDone((body.isDone() != null) ? body.isDone() : taskToUpdate.getIsDone());
         taskToUpdate.setUpdatedAt(LocalDateTime.now());
 
-
         taskRepository.save(taskToUpdate);
         return new MaxTaskDTO(taskToUpdate);
+    }
+
+    public void deleteTask(Task task) {
+        UserDetails loggedUser = authorizationService.getLoggedUser();
+        if (!task.getTaskList().getOwner().getUsername().equalsIgnoreCase(loggedUser.getUsername())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found.");
+        }
+        taskRepository.delete(task);
     }
 }
