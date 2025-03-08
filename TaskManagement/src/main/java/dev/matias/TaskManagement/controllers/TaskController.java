@@ -29,15 +29,20 @@ public class TaskController {
     private TaskService taskService;
 
 
-    @GetMapping
+    @GetMapping("/allTasks")
     public ResponseEntity<List<MaxTaskDTO>> getTasks(){
         return ResponseEntity.ok(taskService.getMaxTasks());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<MaxTaskDTO> getTask(@PathVariable UUID id){
-        Task task = taskRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Task not found"));
-        return ResponseEntity.ok(new MaxTaskDTO(task.getId(), task.getName(), task.getShortDescription(), task.getLongDescription(), task.getIsDone()));
+        return taskService.getTask(id);
+    }
+
+    @GetMapping("/taskList/{id}")
+    public ResponseEntity<List<MaxTaskDTO>> getTasksByTaskListId(@PathVariable UUID id){
+        List<MaxTaskDTO> tasks = taskService.getListByTaskListId(id);
+        return ResponseEntity.ok(tasks);
     }
 
     @PostMapping
