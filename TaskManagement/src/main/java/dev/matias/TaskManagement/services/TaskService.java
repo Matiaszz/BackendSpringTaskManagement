@@ -4,6 +4,7 @@ import dev.matias.TaskManagement.domain.Task;
 import dev.matias.TaskManagement.domain.TaskList;
 import dev.matias.TaskManagement.domain.User;
 import dev.matias.TaskManagement.dtos.MaxTaskDTO;
+import dev.matias.TaskManagement.dtos.TaskUpdateDTO;
 import dev.matias.TaskManagement.repositories.TaskListRepository;
 import dev.matias.TaskManagement.requests.TaskRequest;
 import dev.matias.TaskManagement.repositories.TaskRepository;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,5 +70,23 @@ public class TaskService {
         taskRepository.save(task);
         taskList.addTask(task);
         return ResponseEntity.status(HttpStatus.CREATED).body(task);
+    }
+
+    public MaxTaskDTO updateTask(Task taskToUpdate, TaskUpdateDTO body){
+        UserDetails loggedUser = authorizationService.getLoggedUser();
+
+        if (!taskToUpdate.getTaskList().getOwner().getUsername().equalsIgnoreCase(loggedUser.getUsername())){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found.");
+        }
+
+        taskToUpdate.setName((body.name() != null) ? body.name() : taskToUpdate.getName());
+        taskToUpdate.setLongDescription((body.longDescription() != null) ? body.longDescription() : taskToUpdate.getLongDescription());
+        taskToUpdate.setShortDescription((body.shortDescription() != null) ? body.shortDescription() : taskToUpdate.getShortDescription());
+        taskToUpdate.setIsDone((body.isDone() != null) ? body.isDone() : taskToUpdate.getIsDone());
+        taskToUpdate.setUpdatedAt(LocalDateTime.now());
+
+
+        taskRepository.save(taskToUpdate);
+        return new MaxTaskDTO(taskToUpdate);
     }
 }
