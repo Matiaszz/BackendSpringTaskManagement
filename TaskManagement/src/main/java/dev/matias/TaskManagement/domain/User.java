@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -27,7 +26,6 @@ public class User implements UserDetails {
 
     @Column(length = 35, unique = true)
     private String username;
-
 
     @Column(nullable = false, name = "user_role")
     @Enumerated(EnumType.STRING)
@@ -61,7 +59,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(this.role.equals(UserRole.ADMIN)){
+        if (this.role.equals(UserRole.ADMIN)) {
             return List.of(
                     new SimpleGrantedAuthority("ROLE_ADMIN"),
                     new SimpleGrantedAuthority("ROLE_USER"));

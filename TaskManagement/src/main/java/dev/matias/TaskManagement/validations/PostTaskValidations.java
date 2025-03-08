@@ -2,7 +2,6 @@ package dev.matias.TaskManagement.validations;
 
 import dev.matias.TaskManagement.domain.TaskList;
 import dev.matias.TaskManagement.repositories.TaskListRepository;
-import dev.matias.TaskManagement.repositories.UserRepository;
 import dev.matias.TaskManagement.requests.TaskRequest;
 import dev.matias.TaskManagement.services.AuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +16,11 @@ public class PostTaskValidations {
     private TaskListRepository taskListRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private AuthorizationService authorizationService;
 
     public void validatePostTask(TaskRequest taskRequest) {
-        if (taskRequest == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Body can't be null");
+        if (taskRequest == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Body can't be null");
 
         TaskList taskList = taskListRepository.findById(taskRequest.taskListId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TaskList not found"));
@@ -34,11 +31,16 @@ public class PostTaskValidations {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the owner of this TaskList");
         }
 
-        if (taskRequest.name() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'name' field can't be null");
-        if (taskRequest.shortDescription() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'shortDescription' field can't be null");
-        if (taskRequest.longDescription() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'longDescription' field can't be null");
+        if (taskRequest.name() == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'name' field can't be null");
+        if (taskRequest.shortDescription() == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'shortDescription' field can't be null");
+        if (taskRequest.longDescription() == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'longDescription' field can't be null");
 
-        if (taskRequest.name().length() > 40) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'name' field character limit is 40");
-        if (taskRequest.shortDescription().length() > 80) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'shortDescription' field character limit is 80");
+        if (taskRequest.name().length() > 40)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'name' field character limit is 40");
+        if (taskRequest.shortDescription().length() > 80)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'shortDescription' field character limit is 80");
     }
 }

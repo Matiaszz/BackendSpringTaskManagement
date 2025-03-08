@@ -1,8 +1,6 @@
 package dev.matias.TaskManagement.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import dev.matias.TaskManagement.repositories.TaskListRepository;
-import dev.matias.TaskManagement.repositories.TaskRepository;
 import dev.matias.TaskManagement.services.AuthorizationService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -55,25 +53,26 @@ public class TaskList {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public TaskList(AuthorizationService authorizationService, String title, String shortDescription, String longDescription){
+    public TaskList(AuthorizationService authorizationService, String title, String shortDescription,
+            String longDescription) {
         this.owner = (User) authorizationService.getLoggedUser();
         this.title = (title != null) ? title : "Untitled";
         this.shortDescription = (shortDescription != null) ? shortDescription : "";
         this.longDescription = (longDescription != null) ? longDescription : "";
     }
 
-    public void addTask(Task task){
+    public void addTask(Task task) {
         tasks.add(task);
         task.setTaskList(this);
     }
 
-    public void removeTask(Task task){
+    public void removeTask(Task task) {
         tasks.remove(task);
         task.setTaskList(null);
     }
 
-    public void updateProgress(){
-        if (tasks.isEmpty()){
+    public void updateProgress() {
+        if (tasks.isEmpty()) {
             percentageProgress = 0;
             return;
         }
