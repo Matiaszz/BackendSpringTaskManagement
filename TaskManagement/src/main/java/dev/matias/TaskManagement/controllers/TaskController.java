@@ -8,6 +8,7 @@ import dev.matias.TaskManagement.requests.TaskRequest;
 import dev.matias.TaskManagement.repositories.TaskListRepository;
 import dev.matias.TaskManagement.repositories.TaskRepository;
 import dev.matias.TaskManagement.services.TaskService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
@@ -31,31 +33,36 @@ public class TaskController {
 
     @GetMapping("/allTasks")
     public ResponseEntity<List<MaxTaskDTO>> getTasks() {
+        log.info("Getting All tasks (Admin)");
         return ResponseEntity.ok(taskService.getMaxTasks());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<MaxTaskDTO> getTask(@PathVariable UUID id) {
+        log.info("Getting the task with id: {}", id);
         return taskService.getTask(id);
     }
 
     @GetMapping("/taskList/{id}")
     public ResponseEntity<List<MaxTaskDTO>> getTasksByTaskListId(@PathVariable UUID id) {
         List<MaxTaskDTO> tasks = taskService.getListByTaskListId(id);
+        log.info("Getting task by taskList id: {}", id);
         return ResponseEntity.ok(tasks);
     }
 
     @PostMapping
     public ResponseEntity<MaxTaskDTO> postTask(@RequestBody TaskRequest taskRequest) {
-
+        log.info("Posting task...");
         TaskList taskList = taskListRepository.findById(taskRequest.taskListId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task list not found"));
 
         Task task = taskService.postTask(taskRequest, taskList).getBody();
 
-        if (task == null)
+        if (task == null) {
+            log.error("Bad request: task is null.");
             return ResponseEntity.badRequest().build();
-
+        }
+        log.info("Task posted.");
         return ResponseEntity.ok(new MaxTaskDTO(task));
     }
 
@@ -63,6 +70,8 @@ public class TaskController {
     public ResponseEntity<MaxTaskDTO> updateTask(@RequestBody TaskUpdateDTO task, @PathVariable UUID id) {
         Task foundTask = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found."));
+
+        log.info("Task with id {} updated.", id);
         return ResponseEntity.ok(taskService.updateTask(foundTask, task));
 
     }
@@ -73,6 +82,7 @@ public class TaskController {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found "));
 
         taskService.deleteTask(task);
+        log.info("Task deleted.");
         return ResponseEntity.noContent().build();
 
     }
