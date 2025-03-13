@@ -8,6 +8,7 @@ import dev.matias.TaskManagement.repositories.TaskListRepository;
 import dev.matias.TaskManagement.requests.TaskRequest;
 import dev.matias.TaskManagement.repositories.TaskRepository;
 import dev.matias.TaskManagement.validations.PostTaskValidations;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class TaskService {
     @Autowired
@@ -39,6 +41,7 @@ public class TaskService {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task List not found."));
 
         if (!taskList.getOwner().getUsername().equalsIgnoreCase(loggedUser.getUsername())) {
+            log.error("TaskList owner username is different of the following username: {}. (GET by TaskListId)", loggedUser.getUsername());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tasks not found.");
         }
         return taskList.getTasks().stream().map(MaxTaskDTO::new).toList();
@@ -50,11 +53,14 @@ public class TaskService {
         UserDetails loggedUser = authorizationService.getLoggedUser();
 
         if (!task.getTaskList().getOwner().getUsername().equalsIgnoreCase(loggedUser.getUsername())) {
+            log.error("TaskList owner username is different of the following username: {}. (GET by ID)", loggedUser.getUsername());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task Not found.");
         }
+        log.info("Getting task: {}", task.getId());
         return ResponseEntity.ok(new MaxTaskDTO(task));
     }
 
+    // TODO: REMOVE THIS
     public List<MaxTaskDTO> getMaxTasks() {
         List<Task> tasks = taskRepository.findAll();
         return tasks.stream().map(MaxTaskDTO::new).toList();
@@ -62,12 +68,15 @@ public class TaskService {
 
     public ResponseEntity<Task> postTask(TaskRequest taskRequest, TaskList taskList) {
         postTaskValidations.validatePostTask(taskRequest);
+        System.out.println("\n");
+        log.info("Validated...");
 
         Task task = new Task(taskRequest.name(), taskRequest.shortDescription(), taskRequest.longDescription(),
                 taskList);
 
         taskRepository.save(task);
         taskList.addTask(task);
+        log.info("Task created...");
         return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
 
@@ -75,6 +84,7 @@ public class TaskService {
         UserDetails loggedUser = authorizationService.getLoggedUser();
 
         if (!taskToUpdate.getTaskList().getOwner().getUsername().equalsIgnoreCase(loggedUser.getUsername())) {
+            log.error("TaskList owner username is different of the following username: {}. (PUT)", loggedUser.getUsername());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found.");
         }
 
@@ -87,14 +97,17 @@ public class TaskService {
         taskToUpdate.setUpdatedAt(LocalDateTime.now());
 
         taskRepository.save(taskToUpdate);
+        log.info("Task updated.");
         return new MaxTaskDTO(taskToUpdate);
     }
 
     public void deleteTask(Task task) {
         UserDetails loggedUser = authorizationService.getLoggedUser();
         if (!task.getTaskList().getOwner().getUsername().equalsIgnoreCase(loggedUser.getUsername())) {
+            log.error("TaskList owner username is different of the following username: {}. (DEL)", loggedUser.getUsername());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found.");
         }
+        log.info("Task Deleted.");
         taskRepository.delete(task);
     }
 }

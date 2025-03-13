@@ -31,6 +31,7 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
+    // TODO: REMOVE THIS
     @GetMapping("/allTasks")
     public ResponseEntity<List<MaxTaskDTO>> getTasks() {
         log.info("Getting All tasks (Admin)");
