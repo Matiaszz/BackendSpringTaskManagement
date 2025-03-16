@@ -1,6 +1,7 @@
 package dev.matias.TaskManagement.dtos;
 
-import java.util.UUID;
+import dev.matias.TaskManagement.domain.User;
 
-public record LoginResponseDTO(String token, UUID id) {
+public record LoginResponseDTO(String token, User user) {
+
 }

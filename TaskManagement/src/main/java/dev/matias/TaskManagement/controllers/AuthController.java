@@ -9,7 +9,9 @@ import dev.matias.TaskManagement.dtos.RegisterDTO;
 import dev.matias.TaskManagement.repositories.UserRepository;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,7 +41,12 @@ public class AuthController {
 
         // getPrincipal = User object
         String token = tokenService.generateToken((User) auth.getPrincipal());
-        return ResponseEntity.ok(new LoginResponseDTO(token, ((User) auth.getPrincipal()).getId()));
+
+        ResponseCookie cookie = ResponseCookie.from("token", token).httpOnly(true).secure(false)
+                .sameSite("Strict").path("/").maxAge(86400).build();
+
+        // LoginResponseDTO dto = new LoginResponseDTO(token, ((User) auth.getPrincipal()));
+        return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).build();
     }
 
     @PostMapping("/register")
@@ -60,6 +67,6 @@ public class AuthController {
 
         String token = tokenService.generateToken(user);
 
-        return ResponseEntity.ok(new LoginResponseDTO(token, user.getId()));
+        return ResponseEntity.ok(new LoginResponseDTO(token, user));
     }
 }
