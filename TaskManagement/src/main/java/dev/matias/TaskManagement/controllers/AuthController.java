@@ -9,7 +9,6 @@ import dev.matias.TaskManagement.dtos.RegisterDTO;
 import dev.matias.TaskManagement.repositories.UserRepository;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +31,9 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private BCryptPasswordEncoder pwdEncoder;
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data){
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
@@ -45,8 +47,8 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie.from("token", token).httpOnly(true).secure(false)
                 .sameSite("Strict").path("/").maxAge(86400).build();
 
-        // LoginResponseDTO dto = new LoginResponseDTO(token, ((User) auth.getPrincipal()));
-        return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).build();
+        LoginResponseDTO dto = new LoginResponseDTO(token, ((User) auth.getPrincipal()));
+        return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(dto);
     }
 
     @PostMapping("/register")
@@ -56,7 +58,7 @@ public class AuthController {
             return ResponseEntity.badRequest().build();
         }
 
-        var encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+        var encryptedPassword = pwdEncoder.encode(data.password());
 
         User user = new User(
                 data.username(), data.role().orElse(UserRole.USER), data.name(), data.lastName(), data.email(), encryptedPassword
@@ -67,6 +69,10 @@ public class AuthController {
 
         String token = tokenService.generateToken(user);
 
-        return ResponseEntity.ok(new LoginResponseDTO(token, user));
+        ResponseCookie cookie = ResponseCookie.from("token", token).httpOnly(true).secure(false)
+                .sameSite("Strict").path("/").maxAge(86400).build();
+
+        return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(new LoginResponseDTO(token, user));
+
     }
 }

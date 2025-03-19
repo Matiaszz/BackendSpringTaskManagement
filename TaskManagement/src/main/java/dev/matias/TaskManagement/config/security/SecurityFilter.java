@@ -48,6 +48,16 @@ public class SecurityFilter extends OncePerRequestFilter {
     }
 
     private String recoverToken(HttpServletRequest request) {
+
+        if (request.getCookies() != null){
+            for (var cookie : request.getCookies()){
+                if ("token".equalsIgnoreCase(cookie.getName())){
+                    log.info("Token received from cookie: {}", cookie.getName());
+                    return cookie.getValue();
+                }
+            }
+        }
+
         var authHeader = request.getHeader("Authorization");
         if (authHeader == null) return null;
 
