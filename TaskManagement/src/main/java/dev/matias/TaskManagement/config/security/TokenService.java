@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -51,22 +49,6 @@ public class TokenService {
 
         } catch (Exception e) {
             log.error("Error validating token: {}", e.getMessage());
-            return null;
-        }
-    }
-
-    public Map<String, Object> getClaims(String token){
-        try{
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-            return JWT.require(algorithm)
-                    .build()
-                    .verify(token)
-                    .getClaims()
-                    .entrySet()
-                    .stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().as(Object.class)));
-        } catch (Exception e){
-            log.error("Error extracting claims: {}", e.getMessage());
             return null;
         }
     }

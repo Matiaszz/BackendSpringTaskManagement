@@ -7,15 +7,18 @@ import dev.matias.TaskManagement.dtos.AuthenticationDTO;
 import dev.matias.TaskManagement.dtos.LoginResponseDTO;
 import dev.matias.TaskManagement.dtos.RegisterDTO;
 import dev.matias.TaskManagement.repositories.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @RestController
@@ -73,6 +76,31 @@ public class AuthController {
                 .sameSite("Strict").path("/").maxAge(86400).build();
 
         return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(new LoginResponseDTO(token, user));
+
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<User> getUser(HttpServletRequest request){
+        String token = null;
+
+        if (request.getCookies() != null){
+            for (var cookie : request.getCookies()){
+                if (cookie.getName().equalsIgnoreCase("token")){
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (token == null || token.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
+        String username = tokenService.validateToken(token);
+        User user = (User) userRepository.findByUsername(username).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return ResponseEntity.ok(user);
 
     }
 
