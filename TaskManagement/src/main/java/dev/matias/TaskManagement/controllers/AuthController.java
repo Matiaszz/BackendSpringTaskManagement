@@ -75,4 +75,12 @@ public class AuthController {
         return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(new LoginResponseDTO(token, user));
 
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(){
+        ResponseCookie cookie = ResponseCookie.from("token", "").httpOnly(true).secure(false)
+                .sameSite("Strict").path("/").maxAge(0).build();
+        
+        return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).build();
+    }
 }
