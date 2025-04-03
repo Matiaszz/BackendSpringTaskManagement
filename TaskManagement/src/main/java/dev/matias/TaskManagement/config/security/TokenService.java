@@ -24,13 +24,15 @@ public class TokenService {
         try {
             log.info("Generating token...");
             Algorithm algorithm = Algorithm.HMAC256(this.secret);
-
-            return JWT.create()
+            var token = JWT.create()
                     .withSubject(user.getUsername())
                     .withClaim("id", user.getId().toString())
                     .withClaim("role", user.getRole().toString())
                     .withExpiresAt(new Date(System.currentTimeMillis() + 86400000 * 2))
                     .sign(algorithm);
+
+            log.info("Generated token: {}", token);
+            return token;
 
         } catch (Exception e) {
             log.error("Error generating token: {}", e.getMessage());

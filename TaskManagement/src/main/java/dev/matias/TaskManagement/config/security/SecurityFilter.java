@@ -57,15 +57,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                 }
             }
         }
-
-        var authHeader = request.getHeader("Authorization");
-        if (authHeader == null) return null;
-
-        if (!authHeader.startsWith("Bearer ")){
-            log.warn("Invalid authorization header");
-            return null;
-        }
-        log.info("Valid authorization header");
-        return authHeader.replace("Bearer ", "").trim();
+        log.info("Token in token recovery is null.");
+        return null;
     }
 }
