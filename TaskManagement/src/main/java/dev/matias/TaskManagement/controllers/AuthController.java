@@ -38,7 +38,7 @@ public class AuthController {
     private BCryptPasswordEncoder pwdEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data){
+    public ResponseEntity<User> login(@RequestBody @Valid AuthenticationDTO data){
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
         log.info("Authenticating user {}", data.username());
         var auth = authenticationManager.authenticate(usernamePassword);
@@ -50,12 +50,11 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie.from("token", token).httpOnly(true).secure(true)
                 .sameSite("None").path("/").maxAge(86400).build();
 
-        LoginResponseDTO dto = new LoginResponseDTO(token, ((User) auth.getPrincipal()));
-        return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(dto);
+        return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body((User) auth.getPrincipal());
     }
 
     @PostMapping("/register")
-    public ResponseEntity<LoginResponseDTO> register(@RequestBody @Valid RegisterDTO data){
+    public ResponseEntity<User> register(@RequestBody @Valid RegisterDTO data){
         if (this.userRepository.findByUsername(data.username()).isPresent()) {
             log.warn("User {} already exists", data.username());
             return ResponseEntity.badRequest().build();
@@ -75,7 +74,7 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie.from("token", token).httpOnly(true).secure(true)
                 .sameSite("None").path("/").maxAge(86400).build();
 
-        return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(new LoginResponseDTO(token, user));
+        return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(user);
 
     }
 

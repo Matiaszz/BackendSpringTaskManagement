@@ -2,6 +2,6 @@ package dev.matias.TaskManagement.dtos;
 
 import dev.matias.TaskManagement.domain.User;
 
-public record LoginResponseDTO(String token, User user) {
+public record LoginResponseDTO(User user) {
 
 }
