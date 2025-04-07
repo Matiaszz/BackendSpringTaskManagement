@@ -14,6 +14,13 @@ public class UserService {
     public User updateUser(User authenticatedUser, UserUpdateDTO updateDTO) {
         boolean changed = false;
 
+        if (updateDTO.name() != null && !updateDTO.name().trim().isEmpty()){
+            if (!authenticatedUser.getName().trim().equals(updateDTO.name().trim())){
+                authenticatedUser.setName(updateDTO.name().trim());
+                changed = true;
+            }
+        }
+
         if (updateDTO.lastName() != null && !updateDTO.lastName().trim().isEmpty()) {
             if (!authenticatedUser.getLastName().trim().equals(updateDTO.lastName().trim())) {
                 authenticatedUser.setLastName(updateDTO.lastName().trim());

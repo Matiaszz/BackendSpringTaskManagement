@@ -48,7 +48,7 @@ public class AuthController {
         String token = tokenService.generateToken((User) auth.getPrincipal());
 
         ResponseCookie cookie = ResponseCookie.from("token", token).httpOnly(true).secure(true)
-                .sameSite("Strict").path("/").maxAge(86400).build();
+                .sameSite("None").path("/").maxAge(86400).build();
 
         return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body((User) auth.getPrincipal());
     }
@@ -72,7 +72,7 @@ public class AuthController {
         String token = tokenService.generateToken(user);
 
         ResponseCookie cookie = ResponseCookie.from("token", token).httpOnly(true).secure(true)
-                .sameSite("Strict").path("/").maxAge(86400).build();
+                .sameSite("None").path("/").maxAge(86400).build();
 
         return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(user);
 
@@ -104,7 +104,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(){
         ResponseCookie cookie = ResponseCookie.from("token", "").httpOnly(true).secure(true)
-                .sameSite("Strict").path("/").maxAge(0).build();
+                .sameSite("None").path("/").maxAge(0).build();
         
         return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).build();
     }
