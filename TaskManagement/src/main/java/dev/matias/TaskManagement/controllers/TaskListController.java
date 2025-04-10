@@ -40,12 +40,6 @@ public class TaskListController {
         return taskListService.getTaskListByUser((User) loggedUser);
     }
 
-    // TODO: Remove this
-    @GetMapping("/taskLists")
-    public ResponseEntity<List<TaskListDTO>> getTaskList() {
-        return ResponseEntity.ok(taskListService.getAllTaskLists());
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<TaskListDTO> getTaskListById(@PathVariable UUID id) {
         log.info("Getting taskList by id... {}", id);

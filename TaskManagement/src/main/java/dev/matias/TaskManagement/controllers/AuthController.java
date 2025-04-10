@@ -4,7 +4,6 @@ import dev.matias.TaskManagement.config.security.TokenService;
 import dev.matias.TaskManagement.domain.User;
 import dev.matias.TaskManagement.domain.UserRole;
 import dev.matias.TaskManagement.dtos.AuthenticationDTO;
-import dev.matias.TaskManagement.dtos.LoginResponseDTO;
 import dev.matias.TaskManagement.dtos.RegisterDTO;
 import dev.matias.TaskManagement.repositories.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,7 +37,7 @@ public class AuthController {
     private BCryptPasswordEncoder pwdEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody @Valid AuthenticationDTO data){
+    public ResponseEntity<User> login(@RequestBody @Valid AuthenticationDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
         log.info("Authenticating user {}", data.username());
         var auth = authenticationManager.authenticate(usernamePassword);
@@ -54,7 +53,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody @Valid RegisterDTO data){
+    public ResponseEntity<User> register(@RequestBody @Valid RegisterDTO data) {
         if (this.userRepository.findByUsername(data.username()).isPresent()) {
             log.warn("User {} already exists", data.username());
             return ResponseEntity.badRequest().build();
@@ -63,8 +62,8 @@ public class AuthController {
         var encryptedPassword = pwdEncoder.encode(data.password());
 
         User user = new User(
-                data.username(), data.role().orElse(UserRole.USER), data.name(), data.lastName(), data.email(), encryptedPassword
-        );
+                data.username(), data.role().orElse(UserRole.USER), data.name(), data.lastName(), data.email(),
+                encryptedPassword);
 
         userRepository.save(user);
         log.info("User {} registered", data.username());
@@ -79,18 +78,18 @@ public class AuthController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<User> getUser(HttpServletRequest request){
+    public ResponseEntity<User> getUser(HttpServletRequest request) {
         String token = null;
 
-        if (request.getCookies() != null){
-            for (var cookie : request.getCookies()){
-                if (cookie.getName().equalsIgnoreCase("token")){
+        if (request.getCookies() != null) {
+            for (var cookie : request.getCookies()) {
+                if (cookie.getName().equalsIgnoreCase("token")) {
                     token = cookie.getValue();
                     break;
                 }
             }
         }
-        if (token == null || token.isEmpty()){
+        if (token == null || token.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
@@ -102,10 +101,10 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(){
+    public ResponseEntity<Void> logout() {
         ResponseCookie cookie = ResponseCookie.from("token", "").httpOnly(true).secure(true)
                 .sameSite("None").path("/").maxAge(0).build();
-        
+
         return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).build();
     }
 }
