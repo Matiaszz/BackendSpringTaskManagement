@@ -10,7 +10,7 @@ Clone the backend repository to your local machine:
 
 ```bash
 git clone https://github.com/Matiaszz/BackendSpringTaskManagement.git
-cd BackendSpringTaskManagement
+cd ./BackendSpringTaskManagement/TaskManagement
 ```
 
 ---
